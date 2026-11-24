@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqua Guard AI - Digital Twin Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Background floating particle layers (simulated by CSS) -->
+    <div class="space-bg">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+    </div>
+
+    <div class="dashboard-wrapper">
+        <!-- Top Navigation -->
+        <header class="top-nav">
+            <div class="nav-brand">
+                <span class="nav-icon">💧</span>
+                <div class="nav-title-group">
+                    <h1>AQUA GUARD AI</h1>
+                    <span class="nav-sub">Smart Water Intelligence</span>
+                </div>
+            </div>
+            <div class="nav-center-badge">
+                <span class="tech-glowtext">DLS • DEPTH LIMITED SEARCH</span>
+            </div>
+            <div class="nav-status">
+                <span class="status-dot pulsing"></span>
+                <span class="status-text" id="header-status-text">SYSTEM ONLINE (SIM)</span>
+            </div>
+        </header>
+
+        <!-- Main Workspace Grid -->
+        <main class="workspace-grid">
+            
+            <!-- Column 1: System Control Panels -->
+            <section class="ws-col glass-card" id="col-controls">
+                <div class="card-header">
+                    <h2>SYSTEM CONTROLS</h2>
+                    <span class="card-tag">CNTRL.v3</span>
+                </div>
+
+                <!-- Operating Mode Selector -->
+                <div class="control-section">
+                    <label class="section-label">System Operating Mode</label>
+                    <div class="mode-selector-buttons">
+                        <button id="btn-mode-sim" class="mode-btn active" data-mode="SIMULATION">SIMULATION</button>
+                        <button id="btn-mode-sensor" class="mode-btn" data-mode="SENSOR">SENSOR (IoT)</button>
+                    </div>
+                </div>
+                
+                <!-- Futuristic Capacity Selector Cards -->
+                <div class="control-section" id="capacity-sec">
+                    <label class="section-label">Target Capacity Node</label>
+                    <div class="glowing-nodes-grid">
+                        <div class="cap-node active" data-capacity="200">
+                            <div class="node-glow"></div>
+                            <div class="node-indicator"></div>
+                            <div class="node-content">
+                                <span class="node-vol">200 L</span>
+                                <span class="node-state">ACTIVE STATE</span>
+                            </div>
+                        </div>
+                        <div class="cap-node" data-capacity="400">
+                            <div class="node-glow"></div>
+                            <div class="node-indicator"></div>
+                            <div class="node-content">
+                                <span class="node-vol">400 L</span>
+                                <span class="node-state">SELECTABLE</span>
+                            </div>
+                        </div>
+                        <div class="cap-node" data-capacity="600">
+                            <div class="node-glow"></div>
+                            <div class="node-indicator"></div>
+                            <div class="node-content">
+                                <span class="node-vol">600 L</span>
+                                <span class="node-state">SELECTABLE</span>
+                            </div>
+                        </div>
+                        <div class="cap-node" data-capacity="800">
+                            <div class="node-glow"></div>
+                            <div class="node-indicator"></div>
+                            <div class="node-content">
+                                <span class="node-vol">800 L</span>
+                                <span class="node-state">SELECTABLE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IoT Telemetry Simulator (Only visible or useful in SENSOR mode) -->
+                <div class="control-section" id="iot-simulator-section" style="display: none;">
+                    <label class="section-label">IoT Sensor Telemetry Simulator</label>
+                    <div class="iot-sim-box">
+                        <div class="slider-header">
+                            <span class="field-desc">Sensor Distance (cm)</span>
+                            <span class="badge badge-cyan" id="iot-distance-val">50.0 cm</span>
+                        </div>
+                        <input type="range" id="iot-distance-slider" min="0" max="100" value="50" step="0.5" class="tech-slider">
+                        <button id="btn-send-iot" class="tech-btn tech-btn-secondary" style="margin-top: 0.5rem; padding: 0.5rem 1rem;">
+                            <span class="btn-text">SEND IoT Telemetry</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Depth Limit Slider Control -->
+                <div class="control-section">
+                    <div class="slider-header">
+                        <label class="section-label">DLS Depth Limit</label>
+                        <span class="badge badge-cyan"><span id="depth-limit-val">5</span> depth</span>
+                    </div>
+                    <div class="tech-slider-wrapper">
+                        <input type="range" id="depth-limit-slider" min="1" max="10" value="5" class="tech-slider">
+                        <div class="slider-track-ticks">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                        </div>
+                    </div>
+                    <span class="field-desc">Sets maximum depth threshold for state search space.</span>
+                </div>
+
+                <!-- Interface Operations -->
+                <div class="control-section operations-area" id="ops-btn-sec">
+                    <button id="btn-fill" class="tech-btn tech-btn-primary">
+                        <span class="btn-shine"></span>
+                        <span class="btn-text">MANUAL STEP (+100L)</span>
+                    </button>
+                    <button id="btn-reset" class="tech-btn tech-btn-secondary">
+                        <span class="btn-text">RESET SYSTEM</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Column 2: Digital Twin Visualization -->
+            <section class="ws-col glass-card alignment-center" id="col-visualization">
+                <div class="card-header">
+                    <h2>LIVE DIGITAL TWIN</h2>
+                    <span class="card-tag flashing-blue" id="operating-mode-badge">SIMULATED STATE</span>
+                </div>
+                
+                <div class="digital-twin-container">
+                    <div class="twin-badge-row">
+                        <span class="twin-badge">TELEMETRY LOCK</span>
+                        <span class="flow-status-badge flow-stable" id="flow-status-badge">● SYSTEM STABLE</span>
+                    </div>
+                    
+                    <!-- Cylinder glass tank -->
+                    <div class="cylindrical-tank-wrapper">
+                        <!-- Left-aligned capacity marks -->
+                        <div class="tank-scale-markers">
+                            <div class="scale-mark" style="bottom: 100%;"><span>800 L</span></div>
+                            <div class="scale-mark" style="bottom: 75%;"><span>600 L</span></div>
+                            <div class="scale-mark" style="bottom: 50%;"><span>400 L</span></div>
+                            <div class="scale-mark" style="bottom: 25%;"><span>200 L</span></div>
+                            <div class="scale-mark" style="bottom: 0%;"><span>0 L</span></div>
+                        </div>
+
+                        <!-- Main cylinder -->
+                        <div class="cylinder-tank" id="cylinder-tank">
+                            <div class="cylinder-top-ellipse"></div>
+                            
+                            <!-- Liquid container inside cylinder -->
+                            <div class="cylinder-water-body" id="cylinder-water">
+                                <!-- Wave animation overlay -->
+                                <div class="cylinder-water-surface">
+                                    <div class="wave wave-a"></div>
+                                    <div class="wave wave-b"></div>
+                                </div>
+                                <!-- Content readings inside water -->
+                                <div class="tank-telemetry-overlay">
+                                    <span class="tel-label">CURRENT VOLUME</span>
+                                    <span class="tel-value" id="tank-vol-val">0 L</span>
+                                    <span class="tel-percentage" id="tank-pct-val">0%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Glass gloss reflection -->
+                            <div class="glass-reflection"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tank Simulation Playback Controls -->
+                <div class="algo-controls-bar" style="width: 100%; margin-top: 1rem; align-items: center;">
+                    <span id="playback-state-label" class="playback-state-label" style="font-family: var(--font-sans); font-size: 0.65rem; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; padding: 0.2rem 0.5rem; background: rgba(0,229,255,0.08); border-radius: 4px; margin-right: 0.25rem;">STATE: READY</span>
+                    <button id="btn-algo-start" class="algo-btn btn-start" title="Start Simulation">▶ START</button>
+                    <button id="btn-algo-pause" class="algo-btn btn-pause" title="Pause Simulation" disabled>⏸ PAUSE</button>
+                    <button id="btn-algo-resume" class="algo-btn btn-resume" title="Resume Simulation" disabled>⏯ RESUME</button>
+                    <button id="btn-algo-stop" class="algo-btn btn-stop" title="Stop Simulation" disabled>⏹ STOP</button>
+                    <button id="btn-algo-reset" class="algo-btn btn-reset" title="Reset Simulation" disabled>↺ RESET</button>
+                </div>
+
+                <!-- Water Progress Timeline -->
+                <div class="timeline-container">
+                    <span class="section-label timeline-title">Water Level Timeline</span>
+                    <div class="horizontal-timeline" id="water-timeline">
+                        <div class="timeline-progress-track" id="timeline-track-fill"></div>
+                        <div class="timeline-node" data-value="0">
+                            <div class="node-dot"></div>
+                            <span class="node-label">0L</span>
+                        </div>
+                        <div class="timeline-node" data-value="200">
+                            <div class="node-dot"></div>
+                            <span class="node-label">200L</span>
+                        </div>
+                        <div class="timeline-node" data-value="400">
+                            <div class="node-dot"></div>
+                            <span class="node-label">400L</span>
+                        </div>
+                        <div class="timeline-node" data-value="600">
+                            <div class="node-dot"></div>
+                            <span class="node-label">600L</span>
+                        </div>
+                        <div class="timeline-node" data-value="800">
+                            <div class="node-dot"></div>
+                            <span class="node-label">800L</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Column 3: DLS Algorithm Space -->
+            <section class="ws-col glass-card" id="col-algorithm">
+                <div class="card-header">
+                    <h2>DLS SEARCH ENGINE</h2>
+                    <span class="card-tag text-cyan">BRANCHING SPACE</span>
+                </div>
+
+
+
+                <div class="algo-details-grid">
+                    <div class="detail-badge">
+                        <span class="db-lbl">Explored / Gen:</span>
+                        <span class="db-val text-cyan" id="dls-lbl-nodes-count">0 / 0</span>
+                    </div>
+                    <div class="detail-badge">
+                        <span class="db-lbl">Pruned Nodes:</span>
+                        <span class="db-val text-orange" id="dls-lbl-pruned">0</span>
+                    </div>
+                </div>
+
+                <!-- Search Tree Visualization Branching Nodes -->
+                <div class="vertical-dls-tree-wrapper">
+                    <div class="dls-tree-container-scroll" id="dls-tree-container">
+                        <!-- Created dynamically by JavaScript as an indented tree branch list -->
+                    </div>
+                </div>
+
+                <!-- Terminal logs console -->
+                <div class="terminal-panel">
+                    <div class="terminal-header">
+                        <div class="term-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="term-title">dls_search_telemetry.log</span>
+                    </div>
+                    <div class="terminal-body" id="terminal-logs">
+                        <div class="term-line">> Initializing system telemetry...</div>
+                        <div class="term-line">> Online. Listening for state transitions.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom statistics cards -->
+        <footer class="telemetry-bottom-cards">
+            <!-- Card 1: Water Level and Anomaly Details -->
+            <div class="glass-stat-card card-glow-cyan" id="stat-card-current">
+                <div class="gsc-header">
+                    <span class="gsc-icon">💧</span>
+                    <span class="gsc-label">CURRENT TELEMETRY</span>
+                </div>
+                <div class="gsc-body">
+                    <span class="gsc-main-val" id="bottom-lvl-val">0 L</span>
+                    <span class="gsc-sub-val text-cyan" id="bottom-lvl-diff">▲ +0 L</span>
+                </div>
+                <div class="stat-extra-info" id="sensor-telemetry-status">
+                    Raw distance: 100.0 cm
+                </div>
+            </div>
+
+            <!-- Card 2: Physical boundaries and hardware health -->
+            <div class="glass-stat-card card-glow-blue" id="stat-card-capacity">
+                <div class="gsc-header">
+                    <span class="gsc-icon">◉</span>
+                    <span class="gsc-label">TANK INFRASTRUCTURE</span>
+                </div>
+                <div class="gsc-body">
+                    <span class="gsc-main-val" id="bottom-cap-val">200 L</span>
+                    <span class="gsc-sub-val" id="bottom-cap-pct">0% FULL</span>
+                </div>
+                <div class="stat-extra-info" id="sensor-hardware-status">
+                    Sensor: Simulation Mode
+                </div>
+            </div>
+
+            <!-- Card 3: Real AI Decision Support and Predictions -->
+            <div class="glass-stat-card card-glow-green" id="stat-card-status">
+                <div class="gsc-header">
+                    <span class="gsc-icon">⚡</span>
+                    <span class="gsc-label">SMART STATUS PANEL</span>
+                </div>
+                <div class="gsc-body-intel">
+                    <div class="intel-row">
+                        <span class="intel-lbl">Trend:</span>
+                        <span class="intel-val" id="intel-trend">STABLE</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="intel-lbl">Est. Full / Empty:</span>
+                        <span class="intel-val" id="intel-time">N/A</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="intel-lbl">Overflow Risk:</span>
+                        <span class="intel-val" id="intel-risk">LOW (0.0)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="intel-lbl">Anomaly Flag:</span>
+                        <span class="intel-val" id="intel-anomaly">NONE</span>
+                    </div>
+                    <div class="intel-rec-box" id="intel-rec">
+                        Awaiting data points to build trends...
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Cinematic Custom Modal Overlay -->
+    <div class="modal-overlay" id="full-modal">
+        <!-- Expanding circular ripple backdrops -->
+        <div class="ripple-ring r1"></div>
+        <div class="ripple-ring r2"></div>
+        <div class="ripple-ring r3"></div>
+        
+        <div class="cinematic-modal-content">
+            <div class="modal-glowing-effect"></div>
+            
+            <div class="modal-icon-wrapper">
+                <span class="modal-pulse-icon">💧</span>
+            </div>
+            
+            <div class="modal-text-group">
+                <h3>TANK CAPACITY REACHED</h3>
+                <p class="modal-sub">Physical simulated limit exceeded</p>
+            </div>
+            
+            <div class="modal-digits-display">
+                <span id="modal-water-digits">0</span> <span class="digits-sep">/</span> <span id="modal-cap-digits">0</span> <span class="digits-unit">L</span>
+            </div>
+            
+            <div class="modal-success-stamp">
+                <span class="stamp-icon">✓</span>
+                <span class="stamp-text" id="modal-success-text">DLS TARGET STATE RESOLVED</span>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="tech-btn tech-btn-primary" id="btn-close-modal">
+                    <span class="btn-text">RESET WATER TANK</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
